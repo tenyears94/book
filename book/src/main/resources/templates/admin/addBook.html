@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>录入新书</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/admin.css}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+	<div class="layui-layout layui-layout-admin">
+		<!--   公共头部   -->
+		<div th:insert="common/header :: common_head"></div>
+		<!--   公共左侧导航   -->
+		<div th:insert="common/left :: common_left"></div>
+		<!-- 主体内容 -->
+		<div class="layui-body" align="center">
+			<!--			<div class="layui-card">-->
+			<div class="layui-card-header">录入新书</div>
+			<div class="layui-card-body" style="padding: 15px;">
+				<form class="layui-form" th:action="@{/book/addBook}" method="post" lay-filter="component-form-group">
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍名称</label>
+						<div class="layui-input-inline" style="width: 460px">
+							<input type="text" name="bookName" lay-verify="required" autocomplete="off"
+							       placeholder="请输入书籍名称" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍作者</label>
+						<div class="layui-input-inline" style="width: 460px">
+							<input type="text" name="bookAuthor" lay-verify="required" placeholder="请输入书籍作者"
+							       autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍出版社</label>
+						<div class="layui-input-inline" style="width: 460px">
+							<input type="text" name="bookPublish" lay-verify="required" placeholder="请输入书籍出版社"
+							       autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍类型</label>
+						<div class="layui-input-inline" style="width: 200px">
+							<select name="categoryId" lay-filter="aihao">
+								<option value="" disabled selected style="display: none;">-- 请选择书籍类型 --</option>
+								<option th:each="bookCategory : ${bookCategoryList}"
+								        th:value="${bookCategory.getCategoryId()}"
+								        th:text="${bookCategory.getCategoryName()}">写作
+								</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍价格</label>
+						<div class="layui-input-inline" style="width: 200px;">
+							<input type="text" name="bookPrice" placeholder="￥" autocomplete="off"
+							       class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">书籍数量</label>
+						<div class="layui-input-inline" style="width: 200px;">
+							<input type="text" name="bookNum" lay-verify="required" placeholder="请输入书籍数量"
+							       autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">书籍简介</label>
+						<div class="layui-input-block">
+								<textarea name="bookIntroduction" placeholder="请输入书籍简介"
+								          class="layui-textarea"></textarea>
+						</div>
+					</div>
+					<div class="layui-form-item layui-layout-admin">
+						<div class="layui-input-block">
+							<div class="layui-footer" style="left: 0;">
+								<button type="submit" class="layui-btn" lay-filter="component-form-demo1">立即提交</button>
+								<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!--		</div>-->
+		<!-- 辅助元素，一般用于移动设备下遮罩 -->
+		<div class="layadmin-body-shade" layadmin-event="shade"></div>
+	</div>
+
+</div>
+
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script>
+    $("#book").addClass("layui-nav-itemed");
+    $("#book2").addClass("layui-this");
+    // $(".layui-btn-disabled").attr("disabled", "disabled");
+</script>
+</body>
+</html>

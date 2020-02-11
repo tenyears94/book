@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.javamap.book.dao.BookMapper">
+    <resultMap id="BaseResultMap" type="cn.javamap.book.pojo.Book">
+        <constructor>
+            <idArg column="book_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="book_name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="book_author" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="book_publish" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="category_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="book_price" javaType="java.lang.Double" jdbcType="DOUBLE"/>
+            <arg column="book_introduction" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="book_num" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="borrow_num" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        </constructor>
+        <association property="bookCategory" column="category_id"
+                     select="cn.javamap.book.dao.BookcategoryMapper.selectByPrimaryKey"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    book_id, book_name, book_author, book_publish, category_id, book_price, book_introduction, 
+    book_num, borrow_num
+  </sql>
+    <sql id="Where_List">
+        <trim prefix="where" prefixOverrides="and">
+            <if test="bookId != null">
+                and book_id=#{bookId,jdbcType=INTEGER}
+            </if>
+            <if test="bookName != null">
+                and book_name like concat ('%',#{bookName,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="bookAuthor != null">
+                and book_author=#{bookAuthor,jdbcType=VARCHAR}
+            </if>
+            <if test="bookPublish != null">
+                and book_publish=#{bookPublish,jdbcType=VARCHAR}
+            </if>
+            <if test="categoryId != null">
+                and category_id=#{categoryId,jdbcType=INTEGER}
+            </if>
+            <if test="bookPrice != null">
+                and book_price=#{bookPrice,jdbcType=DOUBLE}
+            </if>
+            <if test="bookIntroduction != null">
+                and book_introduction=#{bookIntroduction,jdbcType=VARCHAR}
+            </if>
+            <if test="bookNum != null">
+                and book_num=#{bookNum,jdbcType=INTEGER}
+            </if>
+            <if test="borrowNum != null">
+                and borrow_num=#{borrowNum,jdbcType=INTEGER}
+            </if>
+        </trim>
+    </sql>
+    <select id="selectAllSelective" parameterType="cn.javamap.book.pojo.Book" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        <include refid="Where_List"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from book
+    where book_id = #{bookId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="cn.javamap.book.pojo.Book">
+    insert into book (book_id, book_name, book_author, 
+      book_publish, category_id, book_price, 
+      book_introduction, book_num, borrow_num
+      )
+    values (#{bookId,jdbcType=INTEGER}, #{bookName,jdbcType=VARCHAR}, #{bookAuthor,jdbcType=VARCHAR}, 
+      #{bookPublish,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER}, #{bookPrice,jdbcType=DOUBLE}, 
+      #{bookIntroduction,jdbcType=VARCHAR}, #{bookNum,jdbcType=INTEGER}, #{borrowNum,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="cn.javamap.book.pojo.Book">
+        insert into book
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">
+                book_id,
+            </if>
+            <if test="bookName != null">
+                book_name,
+            </if>
+            <if test="bookAuthor != null">
+                book_author,
+            </if>
+            <if test="bookPublish != null">
+                book_publish,
+            </if>
+            <if test="categoryId != null">
+                category_id,
+            </if>
+            <if test="bookPrice != null">
+                book_price,
+            </if>
+            <if test="bookIntroduction != null">
+                book_introduction,
+            </if>
+            <if test="bookNum != null">
+                book_num,
+            </if>
+            <if test="borrowNum != null">
+                borrow_num,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">
+                #{bookId,jdbcType=INTEGER},
+            </if>
+            <if test="bookName != null">
+                #{bookName,jdbcType=VARCHAR},
+            </if>
+            <if test="bookAuthor != null">
+                #{bookAuthor,jdbcType=VARCHAR},
+            </if>
+            <if test="bookPublish != null">
+                #{bookPublish,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=INTEGER},
+            </if>
+            <if test="bookPrice != null">
+                #{bookPrice,jdbcType=DOUBLE},
+            </if>
+            <if test="bookIntroduction != null">
+                #{bookIntroduction,jdbcType=VARCHAR},
+            </if>
+            <if test="bookNum != null">
+                #{bookNum,jdbcType=INTEGER},
+            </if>
+            <if test="borrowNum != null">
+                #{borrowNum,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.javamap.book.pojo.Book">
+        update book
+        <set>
+            <if test="bookName != null">
+                book_name = #{bookName,jdbcType=VARCHAR},
+            </if>
+            <if test="bookAuthor != null">
+                book_author = #{bookAuthor,jdbcType=VARCHAR},
+            </if>
+            <if test="bookPublish != null">
+                book_publish = #{bookPublish,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId,jdbcType=INTEGER},
+            </if>
+            <if test="bookPrice != null">
+                book_price = #{bookPrice,jdbcType=DOUBLE},
+            </if>
+            <if test="bookIntroduction != null">
+                book_introduction = #{bookIntroduction,jdbcType=VARCHAR},
+            </if>
+            <if test="bookNum != null">
+                book_num = #{bookNum,jdbcType=INTEGER},
+            </if>
+            <if test="borrowNum != null">
+                borrow_num = #{borrowNum,jdbcType=INTEGER},
+            </if>
+        </set>
+        where book_id = #{bookId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.javamap.book.pojo.Book">
+    update book
+    set book_name = #{bookName,jdbcType=VARCHAR},
+      book_author = #{bookAuthor,jdbcType=VARCHAR},
+      book_publish = #{bookPublish,jdbcType=VARCHAR},
+      category_id = #{categoryId,jdbcType=INTEGER},
+      book_price = #{bookPrice,jdbcType=DOUBLE},
+      book_introduction = #{bookIntroduction,jdbcType=VARCHAR},
+      book_num = #{bookNum,jdbcType=INTEGER},
+      borrow_num = #{borrowNum,jdbcType=INTEGER}
+    where book_id = #{bookId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.javamap.book.dao.BorrowBooksMapper">
+    <resultMap id="BaseResultMap" type="cn.javamap.book.pojo.BorrowBooks">
+        <constructor>
+            <idArg column="borrow_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="book_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="borrow_status" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="borrow_date" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+            <arg column="return_date" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        </constructor>
+        <association property="user" column="user_id"
+                     select="cn.javamap.book.dao.UserMapper.selectByPrimaryKey"/>
+        <association property="book" column="book_id"
+                     select="cn.javamap.book.dao.BookMapper.selectByPrimaryKey"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    borrow_id, user_id, book_id, borrow_status, borrow_date, return_date
+  </sql>
+    <sql id="Where_List">
+        <trim prefix="where 1=1">
+            <if test="borrow.borrowId != null">
+                and borrow_id=#{borrow.borrowId,jdbcType=INTEGER}
+            </if>
+            <if test="borrow.userId != null">
+                and user_id=#{borrow.userId,jdbcType=INTEGER}
+            </if>
+            <if test="borrow.bookId != null">
+                and book_id=#{borrow.bookId,jdbcType=INTEGER}
+            </if>
+            <if test="borrow.borrowStatus != null">
+                and borrow_status=#{borrow.borrowStatus,jdbcType=INTEGER}
+            </if>
+            <if test="borrow.borrowDate != null">
+                and borrow_date=#{borrow.borrowDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="borrow.returnDate != null">
+                and return_date=#{borrow.returnDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="idList != null">
+                <foreach collection="idList" open="and book_id in(" close=")" separator="," item="id">
+                    #{id,jdbcType=INTEGER}
+                </foreach>
+            </if>
+            ORDER BY return_date, borrow_status DESC, borrow_date DESC
+        </trim>
+    </sql>
+    <select id="selectAllSelective" parameterType="cn.javamap.book.pojo.BorrowBooks" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from borrowing_books
+        <include refid="Where_List"/>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from borrowing_books
+        where borrow_id = #{borrowId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from borrowing_books
+    where borrow_id = #{borrowId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="cn.javamap.book.pojo.BorrowBooks">
+    insert into borrowing_books (borrow_id, user_id, book_id, 
+      borrow_status, borrow_date, return_date
+      )
+    values (#{borrowId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{bookId,jdbcType=INTEGER}, 
+      #{borrowStatus,jdbcType=INTEGER}, #{borrowDate,jdbcType=TIMESTAMP}, #{returnDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="cn.javamap.book.pojo.BorrowBooks">
+        insert into borrowing_books
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="borrowId != null">
+                borrow_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="bookId != null">
+                book_id,
+            </if>
+            <if test="borrowStatus != null">
+                borrow_status,
+            </if>
+            <if test="borrowDate != null">
+                borrow_date,
+            </if>
+            <if test="returnDate != null">
+                return_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="borrowId != null">
+                #{borrowId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="bookId != null">
+                #{bookId,jdbcType=INTEGER},
+            </if>
+            <if test="borrowStatus != null">
+                #{borrowStatus,jdbcType=INTEGER},
+            </if>
+            <if test="borrowDate != null">
+                #{borrowDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="returnDate != null">
+                #{returnDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.javamap.book.pojo.BorrowBooks">
+        update borrowing_books
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="bookId != null">
+                book_id = #{bookId,jdbcType=INTEGER},
+            </if>
+            <if test="borrowStatus != null">
+                borrow_status = #{borrowStatus,jdbcType=INTEGER},
+            </if>
+            <if test="borrowDate != null">
+                borrow_date = #{borrowDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="returnDate != null">
+                return_date = #{returnDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where borrow_id = #{borrowId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.javamap.book.pojo.BorrowBooks">
+    update borrowing_books
+    set user_id = #{userId,jdbcType=INTEGER},
+      book_id = #{bookId,jdbcType=INTEGER},
+      borrow_status = #{borrowStatus,jdbcType=INTEGER},
+      borrow_date = #{borrowDate,jdbcType=TIMESTAMP},
+      return_date = #{returnDate,jdbcType=TIMESTAMP}
+    where borrow_id = #{borrowId,jdbcType=INTEGER}
+  </update>
+</mapper>

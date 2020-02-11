@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>注册</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/admin.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/login.css}" media="all">
+</head>
+<body>
+
+
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+	<div class="layadmin-user-login-main" style="padding-top: -150px;">
+		<div class="layadmin-user-login-box layadmin-user-login-header">
+			<h2>用户注册</h2>
+		</div>
+		<form th:action="@{/user/reg}" method="post"
+		      class="layadmin-user-login-box layadmin-user-login-body layui-form">
+			<input type="hidden" id="regIsOk" value="1">
+			<input type="hidden" name="userRole" value="普通用户">
+			<input type="hidden" name="userStatus" value="0">
+			
+			<div class="layui-form-item">
+				<label class="layadmin-user-login-icon layui-icon layui-icon-username"
+				       for="LAY-user-login-nickname"></label>
+				
+				<input type="text" name="userName" id="LAY-user-login-nickname" lay-verify="nickname"
+				       placeholder="请输入用户名"
+				       class="layui-input">
+				<span class="layui-form-mid layui-inline" id="checkName"></span>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layadmin-user-login-icon layui-icon layui-icon-password"
+				       for="LAY-user-login-password"></label>
+				<input type="password" name="userPwd" id="LAY-user-login-password" lay-verify="required"
+				       placeholder="请输入密码"
+				       class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<label class="layadmin-user-login-icon layui-icon layui-icon-password"
+				       for="LAY-user-login-repass"></label>
+				<input type="password" name="repass" id="LAY-user-login-repass" lay-verify="required" placeholder="确认密码"
+				       class="layui-input">
+				<span class="layui-form-mid layui-inline" id="repassIsOk"></span>
+			</div>
+			<div class="layui-form-item">
+				<label class="layadmin-user-login-icon layui-icon layui-icon-file"></label>
+				<input type="email" name="userEmail" id="emailIpt" lay-verify="email" placeholder="请输入邮箱"
+				       class="layui-input">
+				<span class="layui-form-mid layui-inline" id="emailMsg"></span>
+			</div>
+			<div class="layui-form-item">
+				<label class="layadmin-user-login-icon layui-icon layui-icon-tree"></label>
+				<div class="layui-input-inline" style="width: 335px">
+					<select name="deptId" lay-filter="aihao" lay-verify="required">
+						<option value="" disabled selected style="display: none;">-- 请选择学院 --</option>
+						<option th:each="dept : ${deptList}"
+						        th:value="${dept.getDeptId()}"
+						        th:text="${dept.getDeptName()}">
+							<!--th:if="${user} != null"
+							th:selected="${user.getDeptId()} == ${dept.getDeptId()}">-->
+							工程学院
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<input type="checkbox" id="agreement" name="agreement" lay-skin="primary" title="同意用户协议" checked>
+				<span class="layui-form-mid layui-inline" id="agreementIsOk"></span>
+			</div>
+			<div class="layui-form-item">
+				<button type="submit" class="layui-btn layui-btn-fluid" id="regBtn" lay-submit
+				        lay-filter="LAY-user-reg-submit">注 册
+				</button>
+			</div>
+			<div class="layui-trans layui-form-item layadmin-user-login-other">
+				<!--<label>社交账号注册</label>
+				<a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+				<a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+				<a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>-->
+				
+				<a th:href="@{/user/login}" class="layadmin-user-jump-change layadmin-link layui-hide-xs">用已有帐号登入</a>
+				<!--          <a href="../login.html" class="layadmin-user-jump-change layadmin-link layui-hide-sm layui-show-xs-inline-block">登入</a>-->
+			</div>
+		</form>
+	</div>
+	
+	<div class="layui-trans layadmin-user-login-footer">
+		<!--<p>
+		  <span><a href="http://www.layui.com/admin/#get" target="_blank">获取授权</a></span>
+		  <span><a href="http://www.layui.com/admin/pro/" target="_blank">在线演示</a></span>
+		  <span><a href="http://www.layui.com/admin/" target="_blank">前往官网</a></span>
+		</p>-->
+	</div>
+
+</div>
+<script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script>
+    // $(".layui-btn-disabled").attr("disabled", "disabled");
+    //验证用户名
+    $("#LAY-user-login-nickname").blur(function () {
+        var userName = $(this).val();
+        if (userName != "") {
+            // alert(userName);
+            $.post(
+                "/user/checkUserName",
+                {"userName": userName},
+                function (data) {
+                    // alert(data);
+                    var checkName = $("#checkName");
+                    if (data == "exist") {
+                        checkName.html("用户名已存在，请更换！").css({"color": "red"});
+                        $("#regIsOk").val("0");
+                        $("#regBtn").addClass("layui-btn-disabled").attr("disabled", "disabled");
+                    } else {
+                        checkName.html("用户名可用").css({"color": "green"});
+                        $("#regBtn").removeClass("layui-btn-disabled");
+                        $("#regIsOk").val("1");
+                    }
+                }, "text");
+        }
+    });
+
+    /**
+     * 提交表单
+     */
+    $("#regBtn").click(function () {
+        var email = $("#emailIpt").val();
+        if (!$("#agreement").is(':checked')) {
+            $("#agreementIsOk").html("请勾选用户协议").css({"color": "red"});
+            return false;
+        } else if ($("#regIsOk").val() == 0) {
+            $("#checkName").html("请使用合适的用户名").css({"color": "red"});
+            return false;
+        } else if ($("#LAY-user-login-password").val() != $("#LAY-user-login-repass").val()) {
+            $("#repassIsOk").html("两次输入密码不一致").css({"color": "red"});
+            return false;
+        } /*else if (email != "" && !email.match(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,4}){1,2})$/)){
+            $("#emailMsg").html("邮箱格式不正确").css({"color": "red"});
+		} else if (email != "" && email.match(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,4}){1,2})$/)){
+            $("#emailMsg").html("邮箱格式正确").css({"color": "green"});
+        }*/
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.javamap.book.dao.BookcategoryMapper">
+    <resultMap id="BaseResultMap" type="cn.javamap.book.pojo.Bookcategory">
+        <constructor>
+            <idArg column="category_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="category_name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+    category_id, category_name
+  </sql>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book_category
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book_category
+        where category_id = #{categoryId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from book_category
+    where category_id = #{categoryId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="cn.javamap.book.pojo.Bookcategory">
+    insert into book_category (category_id, category_name)
+    values (#{categoryId,jdbcType=INTEGER}, #{categoryName,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.javamap.book.pojo.Bookcategory">
+        insert into book_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                category_id,
+            </if>
+            <if test="categoryName != null">
+                category_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=INTEGER},
+            </if>
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.javamap.book.pojo.Bookcategory">
+        update book_category
+        <set>
+            <if test="categoryName != null">
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where category_id = #{categoryId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.javamap.book.pojo.Bookcategory">
+    update book_category
+    set category_name = #{categoryName,jdbcType=VARCHAR}
+    where category_id = #{categoryId,jdbcType=INTEGER}
+  </update>
+</mapper>

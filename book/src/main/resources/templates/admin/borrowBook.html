@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>查询所有借书记录</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/admin.css}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+	<div class="layui-layout layui-layout-admin">
+		<!--   公共头部   -->
+		<div th:insert="common/header :: common_head"></div>
+		<!--   公共左侧导航   -->
+		<div th:insert="common/left :: common_left"></div>
+		<!-- 主体内容 -->
+		<div class="layui-body" align="center">
+			<form th:action="@{/borrow/list(userId=${userId})}" method="post"
+			      class="layui-form layui-card-header layuiadmin-card-header-auto">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label"></label>
+						<div class="layui-input-block">
+							<input type="text" name="key" placeholder="请输入书籍名称" autocomplete="off"
+							       class="layui-input" th:value="${key}">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<button type="submit" class="layui-btn layuiadmin-btn-useradmin" lay-submit
+						        lay-filter="LAY-user-front-search" style="width: 50px">
+							<i class="layui-icon layui-icon-search"></i></button>
+					</div>
+				</div>
+			</form>
+			<div class="layui-card">
+				<div style="padding: 10px; margin-left: -800px;">
+					<a th:if="${session.login_user} != null"
+					   th:href="@{/borrow/list(borrowStatus=1, userId=${userId})}">
+						<button class="layui-btn layui-btn-radius" data-type="add"><i
+								class="layui-icon layui-icon-read"></i>未归还记录
+						</button>
+					</a>
+					
+					<a th:if="${session.login_user} != null"
+					   th:href="@{/borrow/list(borrowStatus=0, userId=${userId})}">
+						<button class="layui-btn layui-btn-radius" data-type="add"><i
+								class="layui-icon layui-icon-read"></i>已归还记录
+						</button>
+					</a>
+					<a th:if="${session.login_user} != null"
+					   th:href="@{/borrow/list(borrowStatus=2, userId=${userId})}">
+						<button class="layui-btn layui-btn-radius" data-type="add"><i
+								class="layui-icon layui-icon-read"></i>待处理记录
+						</button>
+					</a>
+				</div>
+				<div class="layui-card-body" style="background-color: #F2F2F2">
+					
+					<table class="layui-table" id="LAY-user-manage" lay-filter="LAY-user-manage">
+						<thead class="layui-table-header">
+						<tr class="layui-table-click" align="center" style="font-weight: bolder">
+							<td>书籍名称</td>
+							<td>用户名称</td>
+							<td>借书时间</td>
+							<td>还书时间</td>
+							<td>操作</td>
+						</tr>
+						</thead>
+						<tbody class="layui-table-body">
+						<tr th:if="${borrowBooksArrayList.list} != null" th:each="borrow : ${borrowBooksArrayList.list}"
+						    class="layui-table-click"
+						    align="center">
+							<td th:text="${borrow.borrowId}" style="display: none"></td>
+							<td><a th:href="@{/borrow/list(key=${borrow.getBook().getBookName()})}"
+							       th:text="${borrow.getBook().getBookName()}">1</a></td>
+							<!--							<td th:text="${borrow.getBook().getBookName()}">1</td>-->
+							<td><a th:href="@{/borrow/list(userId=${borrow.getUser().getUserId()})}"
+							       th:text="${borrow.getUser().getUserName()}">1</a></td>
+							<!--							<td th:text="${borrow.getUser().getUserName()}">2</td>-->
+							<td th:text="${#dates.format(borrow.getBorrowDate(), 'yyyy-MM-dd')}">3</td>
+							<td th:if="${borrow.getBorrowStatus()==0} or ${borrow.getBorrowStatus()==1}"
+							    th:text="${borrow.getReturnDate()==null?'待归还':#dates.format(borrow.getReturnDate(), 'yyyy-MM-dd')}">
+								4
+							</td>
+							<td th:if="${borrow.getBorrowStatus()==2}"
+							    th:text="${borrow.getReturnDate()==null?'待处理':'已取消'}">
+								4
+							</td>
+							
+							<td th:if="${session.login_user} != null and (${session.login_user.getUserRole()}=='管理员'
+										or ${session.login_user.getUserRole()}=='超级管理员')" class="operation-td">
+								
+								<!--<button th:if="${borrow.getReturnDate() != null} and ${borrow.getBorrowStatus()==0}"
+								        class="layui-btn layui-btn-disabled">已归还</button>-->
+								<!--<button th:if="${borrow.getReturnDate() != null} and ${borrow.getBorrowStatus()==2}"
+								        class="layui-btn layui-btn-disabled">已取消</button>-->
+								
+								<!--<a th:href="@{'/borrow/update/'+${borrow.getBorrowId()}}"
+								   th:if="${borrow.getReturnDate() == null} and ${borrow.getBorrowStatus()==1}" title="归还">-->
+								<button th:if="${borrow.getReturnDate() == null} and ${borrow.getBorrowStatus()==1}"
+								        title="归还"
+								        class="layui-btn borrow-btn-return">归还
+								</button>
+								<!--								</a>-->
+								<button th:if="${borrow.getReturnDate()} != null and (${borrow.getBorrowStatus()}==2
+									or ${borrow.getBorrowStatus()}==0)"
+								        class="layui-btn layui-btn-danger borrow-btn-delete"
+								        title="删除记录"><i class="layui-icon">&#xe640;</i></button>
+								
+								<!--<a th:href="@{/borrow/update(borrowId=${borrow.getBorrowId()}, borrowStatus=1)}"
+								   th:if="${borrow.getReturnDate() == null} and ${borrow.getBorrowStatus()==2}" title="领书">-->
+								<button th:if="${borrow.getReturnDate() == null} and ${borrow.getBorrowStatus()==2}"
+								        title="领书"
+								        class="layui-btn layui-btn-normal layui-btn-radius borrow-btn-get">领书
+								</button>
+								<!--								</a>-->
+							</td>
+							<td th:if="${session.login_user} != null and ${session.login_user.getUserRole()}=='普通用户'"
+							    class="operation-td">
+								
+								<!--<button th:if="${borrow.getReturnDate()} != null and ${borrow.getBorrowStatus()}==0"
+										class="layui-btn layui-btn-disabled">已归还</button>-->
+								<!--<button th:if="${borrow.getReturnDate()} != null and ${borrow.getBorrowStatus()}==2"
+										class="layui-btn layui-btn-disabled">已取消</button>-->
+								<button th:if="${borrow.getReturnDate()} != null and (${borrow.getBorrowStatus()}==2
+									or ${borrow.getBorrowStatus()}==0)"
+								        class="layui-btn layui-btn-danger borrow-btn-delete"
+								        title="删除记录"><i class="layui-icon">&#xe640;</i></button>
+								
+								<button th:if="${borrow.getReturnDate()} == null and ${borrow.getBorrowStatus()}==1"
+								        class="layui-btn layui-btn-normal">请前往管理员处归还
+								</button>
+								<button th:if="${borrow.getReturnDate()} == null and ${borrow.getBorrowStatus()}==2"
+								        class="layui-btn">请前往管理员处领书
+								</button>
+							
+							</td>
+						</tr>
+						<tr class="layui-table-click" align="center" style="border-right: none">
+							<td colspan="8">
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}<=1">
+									<i class="layui-icon">&#xe603;</i>
+								</button>
+								
+								<span th:if="${session.login_user} != null and ${session.login_user.getUserRole()}=='普通用户'">
+								<a th:href="@{/borrow/list(pageNo=${page.getPageNo()-1}, userId=${userId}, key=${key}, borrowStatus=${status})}"
+								   th:if="${page.getPageNo()}>1">
+									<button class="layui-btn layui-btn-primary" id="preBtn"><i class="layui-icon">&#xe603;</i>
+									</button>
+								</a>
+								
+								<span th:each="page : ${pageList}" class="addClassBtn">
+								<a th:href="@{/borrow/list(pageNo=${page}, userId=${userId}, key=${key}, borrowStatus=${status})}">
+									<button class="layui-btn layui-btn-primary" th:text="${page}"></button></a>
+								</span>
+								
+								<a th:href="@{/borrow/list(pageNo=${page.getPageNo()+1}, userId=${userId}, key=${key}, borrowStatus=${status})}"
+								   th:if="${page.getPageNo()}<${page.getPageCount()}">
+									<button class="layui-btn layui-btn-primary" id="sufBtn"
+									        th:href="@{/borrow/list(pageNo=${page.getPageNo()+1})}">
+										<i class="layui-icon">&#xe602;</i>
+									</button>
+								</a>
+								</span>
+								
+								<span th:if="${session.login_user} != null and (${session.login_user.getUserRole()}=='管理员' or ${session.login_user.getUserRole()}=='超级管理员')">
+								<a th:href="@{/borrow/list(pageNo=${page.getPageNo()-1}, key=${key}, userId=${userId}, borrowStatus=${status})}"
+								   th:if="${page.getPageNo()}>1">
+									<button class="layui-btn layui-btn-primary" id="preBtn"><i class="layui-icon">&#xe603;</i>
+									</button>
+								</a>
+								
+								<span th:each="page : ${pageList}" class="addClassBtn">
+								<a th:href="@{/borrow/list(pageNo=${page}, key=${key}, userId=${userId}, borrowStatus=${status})}">
+									<button class="layui-btn layui-btn-primary" th:text="${page}"></button></a>
+								</span>
+								
+								<a th:href="@{/borrow/list(pageNo=${page.getPageNo()+1}, key=${key}, userId=${userId}, borrowStatus=${status})}"
+								   th:if="${page.getPageNo()}<${page.getPageCount()}">
+									<button class="layui-btn layui-btn-primary" id="sufBtn"
+									        th:href="@{/borrow/list(pageNo=${page.getPageNo()+1})}">
+										<i class="layui-icon">&#xe602;</i>
+									</button>
+								</a>
+								</span>
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}>=${page.getPageCount()}">
+									<i class="layui-icon">&#xe602;</i>
+								</button>
+								<span th:text="'共&nbsp;'+${page.getTotalNum()+'&nbsp;条'}"
+								      style="padding-left: 50px"></span>
+							</td>
+						</tr>
+						<tr class="layui-table-click" th:if="${borrowBooksArrayList.list} == null" align="center">
+							暂无借书信息
+						</tr>
+						</tbody>
+					</table>
+					<input type="hidden" id="pageNo" th:value="${page.getPageNo()}">
+					<input type="hidden" id="pageCount" th:value="${page.getPageCount()}">
+				</div>
+			</div>
+		</div>
+		<!-- 辅助元素，一般用于移动设备下遮罩 -->
+		<div class="layadmin-body-shade" layadmin-event="shade"></div>
+	</div>
+
+</div>
+
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script>
+    $("#borrow").addClass("layui-nav-itemed");
+    $("#borrow1").addClass("layui-this");
+    // $(".layui-btn-disabled").attr("disabled", "disabled");
+
+    /**
+     * 管理员点击 "归还"，将用户借书状态改为0
+     */
+    $(".operation-td .borrow-btn-return").click(function () {
+        var borrowId = parseInt($(this).parent().parent().find("td").eq(0).text());
+        var param = JSON.stringify({"borrowId": borrowId, "borrowStatus": 0});
+        layer.confirm("您确定归还？", {
+            btn: ['确定', '我再想想']
+        }, function () {
+            $.ajax({
+                url: "/borrow/update",
+                type: "post",
+                data: param,
+                // dataType: "json",
+                // dataType: "text",
+                contentType: "application/json;charset=UTF-8",
+                success: function (data) {
+                    // console.log(data);
+                    // alert("终于成功了111");
+                    // alert("成功" + JSON.stringify(data));
+                    if (data == "success") {
+                        layer.alert("归还成功", {icon: 1}, function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        window.location.href = "/book/error";
+                    }
+                },
+                error: function (data) {
+                    // console.log(data);
+                    // alert("失败" + JSON.stringify(data));
+                    window.location.href = "/book/error";
+                }
+            });
+        });
+    });
+
+
+    /**
+     * 管理员点击 "领书"，将用户借书状态改为1
+     */
+    $(".operation-td .borrow-btn-get").click(function () {
+        var borrowId = parseInt($(this).parent().parent().find("td").eq(0).text());
+        var param = JSON.stringify({"borrowId": borrowId, "borrowStatus": 1});
+        layer.confirm("您确定要领取？", {
+            btn: ['确定', '我再想想']
+        }, function () {
+            $.ajax({
+                url: "/borrow/update",
+                type: "post",
+                data: param,
+                // dataType: "json",
+                // dataType: "text",
+                contentType: "application/json;charset=UTF-8",
+                success: function (data) {
+                    // console.log(data);
+                    // alert("终于成功了111");
+                    // alert("成功" + JSON.stringify(data));
+                    if (data == "success") {
+                        layer.alert("借书成功", {icon: 1}, function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        window.location.href = "/book/error";
+                    }
+                },
+                error: function (data) {
+                    // console.log(data);
+                    // alert("失败" + JSON.stringify(data));
+                    window.location.href = "/book/error";
+                }
+            });
+        });
+    });
+
+
+    /**
+     * 删除借书记录
+     */
+
+    $(".operation-td .borrow-btn-delete").click(function () {
+        var borrowId = parseInt($(this).parent().parent().find("td").eq(0).text());
+        layer.confirm("您确定要删除这条借书记录吗？", {
+            btn: ['确定', '我再想想']
+        }, function () {
+            $.post(
+                "/user/borrow/delete", //url
+                {"borrowId": borrowId},
+                function (data) {
+                    if (data == "success") {
+                        window.location.reload();
+                    } else if (data == "less") {
+                        window.location.reload();
+                    } else if (data == "defeat") {
+                        layer.alert("这条记录不能删除哦！", {icon: 2})
+                    } else {
+                        window.location.href = "/book/error";
+                    }
+                }
+            ).error(function () {
+                window.location.href = "/book/error";
+            });
+        });
+    });
+
+    /**
+     *  根据页面改变当前页面的颜色
+     */
+    var pageNo = $("#pageNo").val();
+    var pageCount = $("#pageCount").val();
+    $(".addClassBtn button:eq(" + (pageNo - 1) + ")").addClass("layui-btn-danger");
+    if (pageNo <= 1) {
+        $("#preBtn").addClass("layui-btn-disabled");
+
+    }
+    if (pageNo >= pageCount) {
+        $("#sufBtn").addClass("layui-btn-disabled");
+    }
+</script>
+</body>
+</html>

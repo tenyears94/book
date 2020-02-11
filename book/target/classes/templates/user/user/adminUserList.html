@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>管理员管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/admin.css}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+	<div class="layui-layout layui-layout-admin">
+		<!--   公共头部   -->
+		<div th:insert="common/header :: common_head"></div>
+		<!--   公共左侧导航   -->
+		<div th:insert="common/left :: common_left"></div>
+		<!-- 主体内容 -->
+		<div class="layui-body" align="center">
+			<form th:action="@{/admin/user/list(id=2)}" method="post"
+			      class="layui-form layui-card-header layuiadmin-card-header-auto">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label"></label>
+						<div class="layui-input-block">
+							<input type="text" name="key" placeholder="请输入用户名称" autocomplete="off"
+							       class="layui-input" th:value="${key}">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<button type="submit" class="layui-btn layuiadmin-btn-useradmin" lay-submit
+						        lay-filter="LAY-user-front-search" style="width: 50px">
+							<i class="layui-icon layui-icon-search"></i></button>
+					</div>
+				</div>
+			</form>
+			<div class="layui-card">
+				<div class="layui-card-body" style="background-color: #F2F2F2">
+					
+					<table class="layui-table" id="LAY-user-manage" lay-filter="LAY-user-manage">
+						<thead class="layui-table-header">
+						<tr class="layui-table-click" align="center" style="font-weight: bolder">
+							<td>用户名称</td>
+							<td>学院名称</td>
+							<td>用户邮箱</td>
+							<td>用户使用状态</td>
+							<td>用户角色</td>
+							<td>操作</td>
+						</tr>
+						</thead>
+						<tbody class="layui-table-body">
+						<tr th:if="${userList.list} != null" th:each="user : ${userList.list}" class="layui-table-click"
+						    align="center">
+							<td th:text="${user.getUserName()}">1</td>
+							<td th:text="${user.getDept().getDeptName()}">2</td>
+							<td th:text="${user.getUserEmail()}">3</td>
+							<td th:text="${user.getUserStatus()==0?'可用':'禁用'}">4</td>
+							<td th:text="${user.getUserRole()}" class="userRole">5</td>
+							
+							<!--<td th:if="${session.login_user.getUserRole()}=='管理员'">
+                                <a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1)}">
+                                  <button th:if="${user.getUserRole()}=='管理员' and ${user.getUserRole()}=='超级管理员'"
+                                          th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1)}"
+                                          class="layui-btn layui-btn-danger layui-btn-sm adminBtn layui-btn-disabled">
+                                    <i class="layui-icon layui-icon-close-fill">禁用</i></button>
+                                </a>
+								<a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1)}">
+									<button th:if="${user.getUserStatus()}==0 and ${user.getUserRole()}!='管理员' and ${user.getUserRole()}!='超级管理员'"
+									        class="layui-btn layui-btn-danger layui-btn-sm adminBtn">
+										<i class="layui-icon layui-icon-close-fill">禁用</i></button>
+								</a>
+								
+								<a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=0)}">
+									<button th:if="${user.getUserStatus()}==1"
+									        class="layui-btn layui-btn-sm">
+										<i class="layui-icon layui-icon-ok-circle">解除禁用</i></button>
+								</a>
+							</td>-->
+							<td th:if="${session.login_user.getUserRole()}=='超级管理员'">
+								<!--<a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1, id=2)}">
+									<button th:if="${user.getUserRole()}=='超级管理员'"
+									        th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1)}"
+									        class="layui-btn layui-btn-danger layui-btn-sm adminBtn layui-btn-disabled">
+										<i class="layui-icon layui-icon-close-fill">禁用</i></button>
+								</a>-->
+								<a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=1, id=2)}">
+									<button th:if="${user.getUserStatus()}==0"
+									        class="layui-btn layui-btn-danger layui-btn-sm adminBtn comfirmBtn">
+										<i class="layui-icon layui-icon-close-fill">禁用</i></button>
+								</a>
+								
+								<a th:href="@{'/admin/user/update/'+${user.getUserId()}(userStatus=0, id=2)}">
+									<button th:if="${user.getUserStatus()}==1"
+									        class="layui-btn layui-btn-sm comfirmBtn">
+										<i class="layui-icon layui-icon-ok-circle">解除禁用</i></button>
+								</a>
+							</td>
+						</tr>
+						<tr th:if="${userList} == null" class="layui-table-click"
+						    align="center">暂无用户信息
+						</tr>
+						<tr class="layui-table-click" align="center" style="border-right: none">
+							<td colspan="8">
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}<=1">
+									<i class="layui-icon">&#xe603;</i>
+								</button>
+								<a th:href="@{/admin/user/list(pageNo=${page.getPageNo()-1}, id=2)}"
+								   th:if="${page.getPageNo()}>1">
+									<button class="layui-btn layui-btn-primary" id="preBtn"><i class="layui-icon">&#xe603;</i>
+									</button>
+								</a>
+								
+								<span th:each="page : ${pageList}" class="addClassBtn">
+								<a th:href="@{/admin/user/list(pageNo=${page}, id=2)}">
+									<button class="layui-btn layui-btn-primary" th:text="${page}"></button></a>
+								</span>
+								
+								<a th:href="@{/admin/user/list(pageNo=${page.getPageNo()+1}, id=2)}"
+								   th:if="${page.getPageNo()}<${page.getPageCount()}">
+									<button class="layui-btn layui-btn-primary" id="sufBtn"><i class="layui-icon">&#xe602;</i>
+									</button>
+								</a>
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}>=${page.getPageCount()}">
+									<i class="layui-icon">&#xe602;</i>
+								</button>
+								<span th:text="'共&nbsp;'+${page.getTotalNum()+'&nbsp;条'}"
+								      style="padding-left: 50px"></span>
+							</td>
+						</tr>
+						<tr class="layui-table-click" th:if="${userList.list} == null" align="center">暂无用户信息</tr>
+						</tbody>
+					</table>
+					<input type="hidden" id="pageNo" th:value="${page.getPageNo()}">
+					<input type="hidden" id="pageCount" th:value="${page.getPageCount()}">
+				</div>
+			</div>
+		</div>
+		<!-- 辅助元素，一般用于移动设备下遮罩 -->
+		<div class="layadmin-body-shade" layadmin-event="shade"></div>
+	</div>
+
+</div>
+
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script>
+    $("#webuser").addClass("layui-nav-itemed");
+    $("#webuser2").addClass("layui-this");
+    $(".layui-btn-disabled").attr("disabled", "disabled");
+
+    /**
+     *  根据页面改变当前页面的颜色
+     */
+    var pageNo = $("#pageNo").val();
+    var pageCount = $("#pageCount").val();
+    $(".addClassBtn button:eq(" + (pageNo - 1) + ")").addClass("layui-btn-danger");
+    if (pageNo <= 1) {
+        $("#preBtn").addClass("layui-btn-disabled");
+    }
+    if (pageNo >= pageCount) {
+        $("#sufBtn").addClass("layui-btn-disabled");
+    }
+
+    /**
+     * 为禁用和解除禁用添加提示
+     */
+    $(".comfirmBtn").click(function () {
+        if (confirm("确定继续？")) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+</script>
+</body>
+</html>

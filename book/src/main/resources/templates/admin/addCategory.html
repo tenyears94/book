@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>书籍类别</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<link rel="stylesheet" th:href="@{/style/admin.css}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+	<div class="layui-layout layui-layout-admin">
+		<!--   公共头部   -->
+		<div th:insert="common/header :: common_head"></div>
+		<!--   公共左侧导航   -->
+		<div th:insert="common/left :: common_left"></div>
+		<!-- 主体内容 -->
+		<div class="layui-body" align="center" style="background-color: #F2F2F2">
+			<div th:if="${session.login_user} != null and (${session.login_user.getUserRole()}=='管理员'
+										or ${session.login_user.getUserRole()}=='超级管理员')">
+				<form th:action="@{/category/addCategory}" method="post"
+				      class="layui-form layui-card-header layuiadmin-card-header-auto" id="addForm">
+					<input type="hidden" id="categoryIsOk" value="1">
+					<div class="layui-form-item" style="height: 30px; margin-top: -20px">
+						<div class="layui-inline">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block" style="width: 200px">
+								<input type="text" name="categoryName" placeholder="请输入书籍类别" autocomplete="off"
+								       class="layui-input categoryName" id="categoryName">
+							</div>
+						</div>
+						
+						<div class="layui-inline">
+							<button type="submit" class="layui-btn" lay-submit
+							        lay-filter="LAY-user-front-search" id="addCategory">添加
+							</button>
+						</div>
+					</div>
+				</form>
+				<form class="layui-form layui-card-header layuiadmin-card-header-auto" id="updateForm"
+				      style="display: none">
+					<div class="layui-form-item" style="height: 30px; margin-top: -20px">
+						<div class="layui-inline">
+							<div class="layui-input-block" style="width: 200px">
+								<input type="text" name="categoryName" placeholder="请输入书籍类别" autocomplete="off"
+								       class="layui-input categoryName" id="updateCategoryInput">
+							</div>
+						</div>
+						
+						<div class="layui-inline">
+							<button class="layui-btn layui-btn-disabled" id="updateCategory" disabled="disabled">修改
+							</button>
+						</div>
+					</div>
+				</form>
+				<div class="layui-inline" id="categoryMessage" style="width: 200px"></div>
+			</div>
+			<div class="layui-card layui-card-body" style="background-color: #F2F2F2;">
+				<div class="layui-card-body">
+					<table class="layui-table layui-card-body" id="LAY-user-manage" lay-filter="LAY-user-manage">
+						<thead class="layui-table-header">
+						<tr class="layui-table-click" align="center" style="font-weight: bolder">
+							<td>类别编号</td>
+							<td>类别名称</td>
+							<td th:if="${session.login_user} != null and (${session.login_user.getUserRole()}=='管理员'
+										or ${session.login_user.getUserRole()}=='超级管理员')">操作
+							</td>
+						</tr>
+						</thead>
+						<tbody class="layui-table-body">
+						<tr class="layui-table-click" align="center">
+						</tr>
+						<tr th:if="${bookCategoryList.list} != null" th:each="category : ${bookCategoryList.list}"
+						    class="layui-table-click" align="center">
+							<td th:text="${category.getCategoryId()}" class="categoryId">1</td>
+							<td th:text="${category.getCategoryName()}">2</td>
+							<td class="updateBtnTd" th:if="${session.login_user} != null and (${session.login_user.getUserRole()}=='管理员'
+										or ${session.login_user.getUserRole()}=='超级管理员')">
+								<input type="hidden" th:value="${category.getCategoryId()}">
+								
+								<button class="layui-btn layui-btn-danger layui-btn-sm updateBtn" id="updateBtn"
+								        th:id="${category.getCategoryId()}" style="margin-right: 15px" title="修改">
+									<i class="layui-icon">&#xe642;</i></button>
+								<a th:href="@{'/category/delete/'+${category.getCategoryId()}}">
+									<button
+											class="layui-btn layui-btn-danger layui-btn-sm comfirmBtn" title="删除">
+										<i class="layui-icon">&#xe640;</i></button>
+								</a>
+							</td>
+						</tr>
+						<tr th:if="${bookCategoryList} == null" class="layui-table-click" align="center">暂无类别信息</tr>
+						
+						<tr class="layui-table-click" align="center" style="border-right: none">
+							<td colspan="3">
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}<=1">
+									<i class="layui-icon">&#xe603;</i>
+								</button>
+								<a th:href="@{/category/addCategory(pageNo=${page.getPageNo()-1})}"
+								   th:if="${page.getPageNo()}>1">
+									<button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe603;</i>
+									</button>
+								</a>
+								
+								<span th:each="page : ${pageList}" class="addClassBtn">
+								<a th:href="@{/category/addCategory(pageNo=${page})}">
+									<button class="layui-btn layui-btn-primary" th:text="${page}"></button></a>
+								</span>
+								
+								<a th:href="@{/category/addCategory(pageNo=${page.getPageNo()+1})}"
+								   th:if="${page.getPageNo()}<${page.getPageCount()}">
+									<button class="layui-btn layui-btn-primary" id="sufBtn"><i
+											class="layui-icon">&#xe602;</i>
+									</button>
+								</a>
+								<button class="layui-btn layui-btn-primary layui-btn-disabled"
+								        th:if="${page.getPageNo()}>=${page.getPageCount()}">
+									<i class="layui-icon">&#xe602;</i>
+								</button>
+								
+								<span th:text="'共&nbsp;'+${page.getTotalNum()+'&nbsp;条'}"
+								      style="padding-left: 50px"></span>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+					<input type="hidden" id="pageNo" th:value="${page.getPageNo()}">
+					<input type="hidden" id="pageCount" th:value="${page.getPageCount()}">
+				</div>
+			</div>
+		</div>
+		<!-- 辅助元素，一般用于移动设备下遮罩 -->
+		<div class="layadmin-body-shade" layadmin-event="shade"></div>
+	
+	</div>
+
+</div>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script>
+    $("#book").addClass("layui-nav-itemed");
+    $("#book3").addClass("layui-this");
+    // $(".layui-btn-disabled").attr("disabled", "disabled");
+    /**
+     *  根据页面改变当前页面的颜色
+     */
+    var pageNo = $("#pageNo").val();
+    var pageCount = $("#pageCount").val();
+    $(".addClassBtn button:eq(" + (pageNo - 1) + ")").addClass("layui-btn-danger");
+    // alert($("#preBtn").parent("a"));
+    if (pageNo <= 1) {
+        $("#preBtn").addClass("layui-btn-disabled");
+    }
+    if (pageNo >= pageCount) {
+        $("#sufBtn").addClass("layui-btn-disabled");
+    }
+
+
+    /**
+     *  验证是否能添加
+     */
+    $("#addCategory").click(function () {
+        // alert($("#categoryName").val()+"---");
+        if ($("#categoryName").val() == "" || $("#categoryIsOk").val() == 0) {
+            $("#categoryMessage").html("请选择合适的类别名！").css({"color": "red"});
+            return false;
+        }
+    });
+
+
+    /**
+     *  修改框原本是隐藏的，点击修改按钮，显示修改框，隐藏添加框
+     *  点击修改按钮，异步查询对应类别名，并显示在修改框中
+     */
+    var tdd;
+    var tddName;
+    $(".updateBtn").click(function () {
+        $("#updateForm").show();
+        $("#addForm").hide();
+        var td = $(this).parent().parent().find("td").eq(0).text();
+        var tdName = $(this).parent().parent().find("td").eq(1).text();
+        var updateCategoryInput = $("#updateCategoryInput");
+        $.get(
+            "/category/update/" + td,
+            function (data) {
+                var categoryMessage = $("#categoryMessage");
+                if (data != null) {
+                    updateCategoryInput.val(data.categoryName);
+                }
+            }, "json");
+        tdd = td;
+        tddName = tdName;
+    });
+
+    /**
+     *  点击修改按钮，进行异步修改并回显
+     */
+    $("#updateCategory").click(function () {
+        var categoryName = $("#updateCategoryInput").val();
+        // alert(categoryName);
+        if (tddName != categoryName && categoryName != "") {
+            $.post(
+                "/category/update/" + tdd,
+                {"categoryName": categoryName},
+                function (data) {
+                    // alert(data);
+                    if (data == null) {
+                        window.location.href = "/book/error";
+                    } else {
+                        $("table").find("tr").eq(tdd - 1).find("td").eq(1).text(data.categoryName);
+                    }
+                }, "json");
+        }
+    });
+    /**
+     * 为添加图书类别进行异步验证是否已存在
+     */
+    $(".categoryName").keyup(function () {
+        var categoryName = $(this).val();
+        if (categoryName != "") {
+            // alert(categoryName);
+            $.post(
+                "/category/checkCategory",
+                {"categoryName": categoryName},
+                function (data) {
+                    // alert(data);
+                    var categoryMessage = $("#categoryMessage");
+                    if (data == "exist") {
+                        categoryMessage.html("类别名已存在，请更换！").css({"color": "red"});
+                        $("#categoryIsOk").val("0");
+                        $("#addCategory").addClass("layui-btn-disabled").attr("disabled", "disabled");
+                        $("#updateCategory").addClass("layui-btn-disabled").attr("disabled", "disabled");
+                    } else {
+                        categoryMessage.html("类别名可用").css({"color": "green"});
+                        $("#addCategory").removeClass("layui-btn-disabled").removeAttr("disabled", "disabled");
+                        $("#updateCategory").removeClass("layui-btn-disabled").removeAttr("disabled", "disabled");
+                        $("#categoryIsOk").val("1");
+                    }
+                }, "text");
+
+        } else {
+            $("#categoryMessage").html("");
+        }
+    });
+
+    /**
+     * 为修改和删除添加提示
+     */
+    $(".comfirmBtn").click(function () {
+        if (confirm("此操作不可逆，确定继续？")) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+</script>
+</body>
+</html>
