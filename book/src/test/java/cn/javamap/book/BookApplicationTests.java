@@ -33,4 +33,9 @@ class BookApplicationTests {
         System.out.println(new Date());
     }
 
+    @Test
+    public void testGit(){
+        System.out.println("git修改啦");
+    }
+
 }
