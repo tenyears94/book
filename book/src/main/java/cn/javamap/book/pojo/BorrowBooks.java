@@ -12,7 +12,8 @@ public class BorrowBooks implements Serializable {
     private Integer bookId;
 
     //    0-->归还时间不为空，表示"已归还"
-//    1-->表示书籍已借，"待归还"    2-->表示用户下单，进入"待处理"状态; 归还时间不为空表示"已取消"
+//    1-->表示书籍已借，"待归还"
+//    2-->表示用户下单，进入"待处理"状态; 归还时间不为空表示"已取消"
     private Integer borrowStatus;
 
     private Date borrowDate;
