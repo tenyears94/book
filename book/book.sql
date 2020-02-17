@@ -12,7 +12,9 @@ File Encoding         : 65001
 
 Date: 2018-11-04 22:18:58
 */
-
+DROP DATABASE IF EXISTS `book`;
+CREATE DATABASE `book`;
+USE `book`;
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for `book_category`
